@@ -49,6 +49,26 @@
  * AchievementGui::allowed (map) jz > jmp
  * 74 17 48 83 78 20 00
  * 74 10 31 c0 5b 41 5c 41 5d 41 5e
+ *
+ * New patterns from DoPatch_latest.cpp:
+ *
+ * AchievementStats::allowed jz > jmp
+ * 80 bf 48 02 ? ? ? 75 ? 48 8b 8f 60 04 ? ? 48 85 c9 74
+ *
+ * PlayerData::PlayerData (while loop) jz > jmp
+ * 48 8b 08 80 79 ? ? 74 ? 80 79 ? ? 74 ? 80 79 ? ? 74
+ *
+ * PlayerData::PlayerData (for loop) jz > jmp
+ * 49 3b d0 74 ? 48 8b 02 80 78
+ *
+ * AchievementGUI::updateModdedLabel jz > jmp
+ * 48 8b 02 44 38 48 ? 74 ? 44 38 48 ? 74 ? 44 38 48
+ *
+ * SteamContext::onUserStatsReceived jz > jnz
+ * 8b ? 08 ? 3b ? 74 22 48 8b 01 80 78
+ *
+ * SteamContext::unlockAchievementsThatAreOnSteamButArentActivatedLocally (new pattern) jz > jmp
+ * 48 8b 02 80 78 3e 00 74 ? 80 78 40 00 74 ? 80 78 41 00 75
  */
 
 std::vector<patternData_t> patternList = {
@@ -84,6 +104,24 @@ std::vector<patternData_t> patternList = {
     */
     {PATCH_TYPE_CMOVNZCMOVZ, "PlayerData::PlayerData", 
     "45 f0 e8 ? ? ? ? 48 8b 05 ? ? ? ? 49 8d bd ? ? ? ? 48 89 da 48 89 bd", 1, true},
+
+    {PATCH_TYPE_JZJMP, "AchievementStats::allowed",
+    "80 bf 48 02 ? ? ? 75 ? 48 8b 8f 60 04 ? ? 48 85 c9 74"},
+
+    {PATCH_TYPE_JZJMP, "PlayerData::PlayerData (while loop)",
+    "48 8b 08 80 79 ? ? 74 ? 80 79 ? ? 74 ? 80 79 ? ? 74"},
+
+    {PATCH_TYPE_JZJMP, "PlayerData::PlayerData (for loop)",
+    "49 3b d0 74 ? 48 8b 02 80 78"},
+
+    {PATCH_TYPE_JZJMP, "AchievementGUI::updateModdedLabel",
+    "48 8b 02 44 38 48 ? 74 ? 44 38 48 ? 74 ? 44 38 48"},
+
+    {PATCH_TYPE_JZJNZ, "SteamContext::onUserStatsReceived",
+    "8b ? 08 ? 3b ? 74 22 48 8b 01 80 78"},
+
+    {PATCH_TYPE_JZJMP, "SteamContext::unlockAchievementsThatAreOnSteamButArentActivatedLocally (new pattern)",
+    "48 8b 02 80 78 3e 00 74 ? 80 78 40 00 74 ? 80 78 41 00 75"}
 };
 
 void doPatching(std::vector<std::uint8_t> &buffer, const patternData_t& patternData) {
